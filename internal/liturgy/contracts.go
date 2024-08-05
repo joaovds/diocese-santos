@@ -3,5 +3,5 @@ package liturgy
 import "github.com/joaovds/diocese-santos/pkg/apperr"
 
 type Usecases interface {
-	GetCurrentLiturgicalInfo() (*Liturgy, *apperr.AppError)
+	GetCurrentLiturgicalInfo() (*GetCurrentLiturgicalInfoResponse, *apperr.AppError)
 }
