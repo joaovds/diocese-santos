@@ -12,6 +12,19 @@ type AppError struct {
 	Status    int        `json:"status_code"`
 }
 
+func NewAppError(errCode *ErrorCode, messageList *map[*ErrorCode]string) *AppError {
+	var defaultStatus = 500
+	msg, ok := (*messageList)[errCode]
+	if !ok {
+		msg = "Unknown error"
+	}
+	return &AppError{
+		ErrorCode: errCode,
+		Message:   msg,
+		Status:    defaultStatus,
+	}
+}
+
 func (a *AppError) Error() string {
 	return a.Message
 }
