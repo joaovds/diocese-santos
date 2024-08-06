@@ -1,6 +1,8 @@
 package helpers
 
 import (
+	"bytes"
+	"encoding/json"
 	"testing"
 
 	"github.com/joaovds/diocese-santos/pkg/apperr"
@@ -54,5 +56,25 @@ func TestHttpResponse(t *testing.T) {
 		assert.True(t, resp.IsError)
 		assert.Equal(t, "from error", resp.Error)
 		assert.Equal(t, "Err", resp.ErrorCode)
+	})
+}
+
+func TestSendHttpResponse(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		var buffer bytes.Buffer
+		response := NewHttpResponseFromData(201, "created example")
+		err := SendHttpResponse(&buffer, response)
+
+		expectedOut, _ := json.Marshal(response)
+		assert.NoError(t, err)
+		assert.JSONEq(t, string(expectedOut), buffer.String())
+	})
+
+	t.Run("fail", func(t *testing.T) {
+		var buffer bytes.Buffer
+		failSerialize := make(chan int)
+		response := NewHttpResponseFromData(201, failSerialize)
+		err := SendHttpResponse(&buffer, response)
+		assert.Error(t, err)
 	})
 }

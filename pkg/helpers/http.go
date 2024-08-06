@@ -1,6 +1,12 @@
 package helpers
 
-import "github.com/joaovds/diocese-santos/pkg/apperr"
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+
+	"github.com/joaovds/diocese-santos/pkg/apperr"
+)
 
 type HttpResponse struct {
 	ErrorCode  string `json:"error_code,omitempty"`
@@ -40,4 +46,15 @@ func NewHttpResponseFromError(err *apperr.AppError) *HttpResponse {
 		IsError:    true,
 		StatusCode: statusCode,
 	}
+}
+
+func SendHttpResponse(writer io.Writer, response *HttpResponse) error {
+	resJson, err := json.Marshal(response)
+	if err != nil {
+		fmt.Fprint(writer, err.Error())
+		return err
+	}
+
+	fmt.Fprint(writer, string(resJson))
+	return nil
 }
