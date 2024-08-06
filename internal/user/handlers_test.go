@@ -43,7 +43,7 @@ func TestHandlers_getByID(t *testing.T) {
 
 		h := &Handlers{mux: http.NewServeMux(), usecases: mockUsecases}
 		h.SetupRoutes()
-		req := httptest.NewRequest("GET", "/get-by-id", nil)
+		req := httptest.NewRequest("GET", "/1", nil)
 		rr := httptest.NewRecorder()
 		h.mux.ServeHTTP(rr, req)
 
@@ -64,13 +64,28 @@ func TestHandlers_getByID(t *testing.T) {
 
 		h := &Handlers{mux: http.NewServeMux(), usecases: mockUsecases}
 		h.SetupRoutes()
-		req := httptest.NewRequest("GET", "/get-by-id", nil)
+		req := httptest.NewRequest("GET", "/1", nil)
 		rr := httptest.NewRecorder()
 		h.mux.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusInternalServerError, rr.Code)
 		response := rr.Body.String()
 		assert.Contains(t, response, "testing err")
+		mockUsecases.AssertExpectations(t)
+	})
+
+	t.Run("should return an error if user id is invalid", func(t *testing.T) {
+		mockUsecases := new(MockUsecases)
+
+		h := &Handlers{mux: http.NewServeMux(), usecases: mockUsecases}
+		h.SetupRoutes()
+		req := httptest.NewRequest("GET", "/1nvalid", nil)
+		rr := httptest.NewRecorder()
+		h.mux.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		response := rr.Body.String()
+		assert.Contains(t, response, "invalid user id")
 		mockUsecases.AssertExpectations(t)
 	})
 }

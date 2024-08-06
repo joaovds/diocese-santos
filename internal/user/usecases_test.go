@@ -21,7 +21,7 @@ func TestNewUserUsecases(t *testing.T) {
 			assert.NotNil(t, result)
 			assert.Equal(t, 1, result.ID)
 			assert.Equal(t, "Carol", result.FirstName)
-			assert.Equal(t, "thebestpope", result.Password)
+			assert.Empty(t, result.Password)
 		})
 	})
 }

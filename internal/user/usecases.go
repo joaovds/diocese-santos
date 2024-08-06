@@ -16,6 +16,6 @@ func (u *UserUsecases) GetByID(id int) (*User, *apperr.AppError) {
 		FirstName: "Carol",
 		LastName:  "Wojtyła",
 		Email:     "johnpaul.ii@mail.com",
-		Password:  "thebestpope",
+		Password:  "",
 	}, nil
 }

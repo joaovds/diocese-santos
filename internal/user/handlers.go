@@ -3,6 +3,7 @@ package user
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 )
 
 type Handlers struct {
@@ -22,15 +23,22 @@ func NewHandlers(mux *http.ServeMux) *Handlers {
 // ----- ... -----
 
 func (h *Handlers) SetupRoutes() {
-	h.mux.HandleFunc("GET /get-by-id", h.getByID)
+	h.mux.HandleFunc("GET /{id}", h.getByID)
 }
 
 // ----- ... -----
 
 func (h *Handlers) getByID(w http.ResponseWriter, r *http.Request) {
-	user, err := h.usecases.GetByID(1)
-	if err.IsError() {
-		http.Error(w, err.Message, err.Status)
+	userIDstr := r.PathValue("id")
+	userID, err := strconv.Atoi(userIDstr)
+	if err != nil {
+		http.Error(w, "invalid user id", http.StatusBadRequest)
+		return
+	}
+
+	user, appErr := h.usecases.GetByID(userID)
+	if appErr.IsError() {
+		http.Error(w, appErr.Message, appErr.Status)
 		return
 	}
 
