@@ -3,11 +3,11 @@ package liturgy
 import "time"
 
 type Liturgy struct {
-	Date             time.Time
-	LiturgicalYear   string
-	LiturgicalSeason string
-	LiturgicalWeek   string
-	LiturgicalColor  string
+	Date             time.Time `json:"date"`
+	LiturgicalYear   string    `json:"liturgical_year"`
+	LiturgicalSeason string    `json:"liturgical_season"`
+	LiturgicalWeek   string    `json:"liturgical_week"`
+	LiturgicalColor  string    `json:"liturgical_color"`
 }
 
 func NewLiturgy(liturgicalYear, liturgicalSeason, liturgicalWeek, liturgicalColor string) *Liturgy {

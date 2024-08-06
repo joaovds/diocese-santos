@@ -10,6 +10,6 @@ func NewLiturgyUsecases() *LiturgyUsecases {
 
 // ----- ... -----
 
-func (l *LiturgyUsecases) GetCurrentLiturgicalInfo() (*GetCurrentLiturgicalInfoResponse, *apperr.AppError) {
-	return NewGetCurrentLiturgicalInfoResponse(NewLiturgy("A", "Tempo Comum", "3° semana", "Verde")), nil
+func (l *LiturgyUsecases) GetCurrentLiturgicalInfo() (*Liturgy, *apperr.AppError) {
+	return NewLiturgy("A", "Tempo Comum", "3° semana", "Verde"), nil
 }

@@ -34,6 +34,6 @@ func (h *Handlers) getCurrentLiturgicalInfo(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	w.WriteHeader(http.StatusUnprocessableEntity)
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(currentLiturgicalInfo)
 }
