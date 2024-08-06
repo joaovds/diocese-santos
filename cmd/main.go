@@ -7,6 +7,7 @@ import (
 
 	"github.com/joaovds/diocese-santos/internal/liturgy"
 	"github.com/joaovds/diocese-santos/internal/parish"
+	"github.com/joaovds/diocese-santos/internal/user"
 )
 
 func main() {
@@ -16,6 +17,7 @@ func main() {
 
 	liturgy.NewHandlers(muxV1).SetupRoutes()
 	parish.NewHandlers(muxV1).SetupRoutes()
+	user.NewHandlers(muxV1).SetupRoutes()
 
 	log.Println("Server running on port", 3333)
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", "3333"), mainMux); err != nil {
