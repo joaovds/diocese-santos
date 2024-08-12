@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/joaovds/diocese-santos/pkg/apperr"
+	"github.com/joaovds/diocese-santos/pkg/helpers"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -48,10 +49,10 @@ func TestHandlers_getByID(t *testing.T) {
 		h.mux.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		var user *User
-		err := json.NewDecoder(rr.Body).Decode(&user)
+		var res helpers.HttpResponse[*User]
+		err := json.NewDecoder(rr.Body).Decode(&res)
 		assert.NoError(t, err)
-		assert.Equal(t, expectedUser, user)
+		assert.Equal(t, expectedUser, res.Data)
 		mockUsecases.AssertExpectations(t)
 	})
 
@@ -85,7 +86,7 @@ func TestHandlers_getByID(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
 		response := rr.Body.String()
-		assert.Contains(t, response, "invalid user id")
+		assert.Contains(t, response, "Invalid user ID")
 		mockUsecases.AssertExpectations(t)
 	})
 }

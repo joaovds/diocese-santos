@@ -2,22 +2,21 @@ package helpers
 
 import (
 	"encoding/json"
-	"fmt"
-	"io"
+	"net/http"
 
 	"github.com/joaovds/diocese-santos/pkg/apperr"
 )
 
-type HttpResponse struct {
+type HttpResponse[T any] struct {
 	ErrorCode  string `json:"error_code,omitempty"`
 	Error      string `json:"error,omitempty"`
 	IsError    bool   `json:"is_error"`
 	StatusCode int    `json:"status_code"`
-	Data       any    `json:"data,omitempty"`
+	Data       T      `json:"data,omitempty"`
 }
 
-func NewHttpResponse(errorCode, err string, isError bool, statusCode int, data any) *HttpResponse {
-	return &HttpResponse{
+func NewHttpResponse[T any](errorCode, err string, isError bool, statusCode int, data T) *HttpResponse[T] {
+	return &HttpResponse[T]{
 		ErrorCode:  errorCode,
 		Error:      err,
 		IsError:    isError,
@@ -26,21 +25,21 @@ func NewHttpResponse(errorCode, err string, isError bool, statusCode int, data a
 	}
 }
 
-func NewHttpResponseFromData(statusCode int, data any) *HttpResponse {
-	return &HttpResponse{
+func NewHttpResponseFromData[T any](statusCode int, data T) *HttpResponse[T] {
+	return &HttpResponse[T]{
 		IsError:    false,
 		StatusCode: statusCode,
 		Data:       data,
 	}
 }
 
-func NewHttpResponseFromError(err *apperr.AppError) *HttpResponse {
+func NewHttpResponseFromError[T any](err *apperr.AppError) *HttpResponse[T] {
 	statusCode := 500
 	if err.Status > 0 {
 		statusCode = err.Status
 	}
 
-	return &HttpResponse{
+	return &HttpResponse[T]{
 		ErrorCode:  string(*err.ErrorCode),
 		Error:      err.Error(),
 		IsError:    true,
@@ -48,13 +47,13 @@ func NewHttpResponseFromError(err *apperr.AppError) *HttpResponse {
 	}
 }
 
-func SendHttpResponse(writer io.Writer, response *HttpResponse) error {
+func SendHttpResponse[T any](writer http.ResponseWriter, response *HttpResponse[T]) {
 	resJson, err := json.Marshal(response)
 	if err != nil {
-		fmt.Fprint(writer, err.Error())
-		return err
+		http.Error(writer, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	fmt.Fprint(writer, string(resJson))
-	return nil
+	writer.WriteHeader(response.StatusCode)
+	writer.Write(resJson)
 }

@@ -1,8 +1,9 @@
 package helpers
 
 import (
-	"bytes"
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/joaovds/diocese-santos/pkg/apperr"
@@ -11,9 +12,9 @@ import (
 
 func TestHttpResponse(t *testing.T) {
 	t.Run("should return new http response", func(t *testing.T) {
-		resp := NewHttpResponse("code", "err", true, 409, nil)
+		resp := NewHttpResponse[any]("code", "err", true, 409, nil)
 		assert.NotNil(t, resp)
-		assert.IsType(t, &HttpResponse{}, resp)
+		assert.IsType(t, &HttpResponse[any]{}, resp)
 		assert.Equal(t, "code", resp.ErrorCode)
 		assert.Equal(t, "err", resp.Error)
 		assert.True(t, resp.IsError)
@@ -36,7 +37,7 @@ func TestHttpResponse(t *testing.T) {
 		errCode := apperr.ErrorCode("Err")
 		err := &apperr.AppError{ErrorCode: &errCode, Message: "from error", Status: 400}
 
-		resp := NewHttpResponseFromError(err)
+		resp := NewHttpResponseFromError[any](err)
 		assert.NotNil(t, resp)
 		assert.Equal(t, 400, resp.StatusCode)
 		assert.Nil(t, resp.Data)
@@ -49,7 +50,7 @@ func TestHttpResponse(t *testing.T) {
 		errCode := apperr.ErrorCode("Err")
 		err := &apperr.AppError{ErrorCode: &errCode, Message: "from error"}
 
-		resp := NewHttpResponseFromError(err)
+		resp := NewHttpResponseFromError[any](err)
 		assert.NotNil(t, resp)
 		assert.Equal(t, 500, resp.StatusCode)
 		assert.Nil(t, resp.Data)
@@ -61,20 +62,19 @@ func TestHttpResponse(t *testing.T) {
 
 func TestSendHttpResponse(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
-		var buffer bytes.Buffer
+		recorder := httptest.NewRecorder()
 		response := NewHttpResponseFromData(201, "created example")
-		err := SendHttpResponse(&buffer, response)
+		SendHttpResponse(recorder, response)
 
 		expectedOut, _ := json.Marshal(response)
-		assert.NoError(t, err)
-		assert.JSONEq(t, string(expectedOut), buffer.String())
+		assert.JSONEq(t, string(expectedOut), recorder.Body.String())
 	})
 
 	t.Run("fail", func(t *testing.T) {
-		var buffer bytes.Buffer
+		recorder := httptest.NewRecorder()
 		failSerialize := make(chan int)
 		response := NewHttpResponseFromData(201, failSerialize)
-		err := SendHttpResponse(&buffer, response)
-		assert.Error(t, err)
+		SendHttpResponse(recorder, response)
+		assert.Equal(t, http.StatusInternalServerError, recorder.Code)
 	})
 }
