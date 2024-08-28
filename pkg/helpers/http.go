@@ -35,12 +35,16 @@ func NewHttpResponseFromData[T any](statusCode int, data T) *HttpResponse[T] {
 
 func NewHttpResponseFromError[T any](err *apperr.AppError) *HttpResponse[T] {
 	statusCode := 500
+	errorCode := apperr.ErrorCode("UNKNOWN")
 	if err.Status > 0 {
 		statusCode = err.Status
 	}
+	if err.ErrorCode != nil {
+		errorCode = *err.ErrorCode
+	}
 
 	return &HttpResponse[T]{
-		ErrorCode:  string(*err.ErrorCode),
+		ErrorCode:  string(errorCode),
 		Error:      err.Error(),
 		IsError:    true,
 		StatusCode: statusCode,
