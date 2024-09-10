@@ -13,7 +13,7 @@ func (u *UserUsecases) SignIn(ctx context.Context, params *SignInUsecaseParams) 
 		return nil, err.SetStatus(http.StatusBadRequest)
 	}
 	println("created")
-	return NewSignInUsecaseResult(), nil
+	return NewSignInUsecaseResult("any_id", params.Email), nil
 }
 
 type SignInUsecaseParams struct {
@@ -21,10 +21,6 @@ type SignInUsecaseParams struct {
 	LastName  string `json:"last_name"`
 	Email     string `json:"email"`
 	Password  string `json:"password"`
-}
-
-func NewSignInUsecaseParams() *SignInUsecaseParams {
-	return &SignInUsecaseParams{}
 }
 
 func (sp *SignInUsecaseParams) validate() *apperr.AppError {
@@ -46,8 +42,14 @@ func (sp *SignInUsecaseParams) validate() *apperr.AppError {
 
 // ----- ... -----
 
-type SignInUsecaseResult struct{}
+type SignInUsecaseResult struct {
+	ID    string `json:"id"`
+	Email string `json:"email"`
+}
 
-func NewSignInUsecaseResult() *SignInUsecaseResult {
-	return &SignInUsecaseResult{}
+func NewSignInUsecaseResult(id, email string) *SignInUsecaseResult {
+	return &SignInUsecaseResult{
+		ID:    id,
+		Email: email,
+	}
 }

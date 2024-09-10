@@ -2,7 +2,6 @@ package user
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/joaovds/diocese-santos/internal/user/errs"
@@ -30,14 +29,13 @@ func (h *Handlers) SetupRoutes() {
 // ----- ... -----
 
 func (h *Handlers) signIn(w http.ResponseWriter, r *http.Request) {
-	params := usecases.NewSignInUsecaseParams()
+	params := new(usecases.SignInUsecaseParams)
 	if err := json.NewDecoder(r.Body).Decode(params); err != nil {
 		helpers.SendHttpResponse(w, helpers.NewHttpResponseFromError[any](apperr.NewAppError(&errs.INVALID_PARAMS, &errs.UserErrors).SetStatus(http.StatusBadRequest)))
 		return
 	}
 	result, appErr := h.usecases.SignIn(r.Context(), params)
 	if appErr.IsError() {
-		fmt.Println("aqui", appErr)
 		helpers.SendHttpResponse(w, helpers.NewHttpResponseFromError[any](appErr))
 		return
 	}

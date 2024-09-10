@@ -77,7 +77,7 @@ func TestHandlers_signIn(t *testing.T) {
 
 	t.Run("should return 201 status and result on valid input", func(t *testing.T) {
 		mockUsecases := new(usecases.MockUserUsecases)
-		mockUsecases.On("SignIn", mock.Anything, mock.AnythingOfType("*usecases.SignInUsecaseParams")).Return(&usecases.SignInUsecaseResult{}, nil)
+		mockUsecases.On("SignIn", mock.Anything, mock.AnythingOfType("*usecases.SignInUsecaseParams")).Return(usecases.NewSignInUsecaseResult("any_id", "mail"), nil)
 
 		h := &Handlers{mux: http.NewServeMux(), usecases: mockUsecases}
 		h.SetupRoutes()
@@ -91,6 +91,8 @@ func TestHandlers_signIn(t *testing.T) {
 		var bodyResponse helpers.HttpResponse[*usecases.SignInUsecaseResult]
 		err := json.NewDecoder(rr.Body).Decode(&bodyResponse)
 		assert.Nil(t, err)
+		assert.NotEmpty(t, bodyResponse.Data.ID)
+		assert.Equal(t, "mail", bodyResponse.Data.Email)
 
 		mockUsecases.AssertExpectations(t)
 	})
