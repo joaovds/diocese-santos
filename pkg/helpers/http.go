@@ -8,11 +8,11 @@ import (
 )
 
 type HttpResponse[T any] struct {
+	Data       T      `json:"data,omitempty"`
 	ErrorCode  string `json:"error_code,omitempty"`
 	Error      string `json:"error,omitempty"`
-	IsError    bool   `json:"is_error"`
 	StatusCode int    `json:"status_code"`
-	Data       T      `json:"data,omitempty"`
+	IsError    bool   `json:"is_error"`
 }
 
 func NewHttpResponse[T any](errorCode, err string, isError bool, statusCode int, data T) *HttpResponse[T] {
